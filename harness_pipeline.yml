@@ -1,0 +1,84 @@
+pipeline:
+  name: My First CI-CD Pipeline
+  identifier: my_first_ci_cd_pipeline
+  projectIdentifier: my_dev_project
+  orgIdentifier: my_organization
+  description: This pipeline builds a Docker image and deploys it to Kubernetes.
+  variables:
+    - name: image_name
+      type: String
+      value: my-app
+    - name: docker_repo
+      type: String
+      value: docker.io/my-username
+
+  stages:
+    # CI Stage: Build and push Docker image
+    - stage:
+        name: Build Docker Image
+        identifier: build_docker_image
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: my_k8s_cluster_connector
+              namespace: harness-ci
+              # You can also specify pod configurations, resources, etc.
+          execution:
+            steps:
+              - step:
+                  name: Build and Push
+                  identifier: build_and_push
+                  type: BuildAndPushDockerRegistry
+                  spec:
+                    imagePath: "<+pipeline.variables.docker_repo>/<+pipeline.variables.image_name>"
+                    tag: "latest"
+                    connectorRef: docker_hub_connector # Connector to Docker Hub or other registry
+                    repo: "<+pipeline.variables.docker_repo>"
+                    push: true
+                    # context: . # Context for Docker build
+                    # dockerfile: Dockerfile # Path to Dockerfile
+                    # buildArgs: # Optional build arguments
+                    #   - key: MY_ARG
+                    #     value: my_value
+
+    - stage:
+        name: Deploy to Kubernetes
+        identifier: deploy_to_kubernetes
+        type: CD
+        spec:
+          serviceConfig:
+            serviceRef: my_app_service # Reference to a Harness service for your application
+          infrastructure:
+            infrastructureDefinition:
+              type: KubernetesDirect
+              spec:
+                connectorRef: my_k8s_cluster_connector
+                namespace: default
+                releaseName: my-app-release
+          execution:
+            steps:
+              - step:
+                  name: Deploy Manifests
+                  identifier: deploy_manifests
+                  type: ApplyManifests
+                  spec:
+                    filePaths:
+                      - manifests/deployment.yaml
+                      - manifests/service.yaml
+                    skipResourceVersioning: false
+                    # delegateSelectors: # Optional delegate selectors
+                    #   - k8s-delegate
+            rollbackSteps:
+              - step:
+                  name: Rollback Manifests
+                  identifier: rollback_manifests
+                  type: ApplyManifests
+                  spec:
+                    filePaths:
+                      - manifests/deployment.yaml
+                      - manifests/service.yaml
+                    skipResourceVersioning: false
+                    # This step would typically handle rolling back to the previous successful state
