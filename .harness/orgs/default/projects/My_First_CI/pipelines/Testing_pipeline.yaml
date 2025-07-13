@@ -13,7 +13,6 @@ pipeline:
     - stage:
         name: build stage
         identifier: build_stage
-        description: ""
         type: CI
         spec:
           cloneCodebase: true
@@ -42,7 +41,7 @@ pipeline:
                         branch: My_testing_branch
               - step:
                   type: Run
-                  name: Run_1
+                  name: Maven Build
                   identifier: Run_1
                   spec:
                     shell: Sh
