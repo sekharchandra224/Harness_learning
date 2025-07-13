@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: java-container
-          image: <+pipeline.artifacts.primary.image>   # Replaced by Harness at runtime
+          image: chandrasekhar3122/javaapp:1.0
           ports:
             - containerPort: 8080
