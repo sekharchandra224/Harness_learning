@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: java-container
-          image: chandradee/javaapp:1.0   # ✅ Your public image
+          image: image: chandradee/javaapp:1.0
           ports:
             - containerPort: 8080
