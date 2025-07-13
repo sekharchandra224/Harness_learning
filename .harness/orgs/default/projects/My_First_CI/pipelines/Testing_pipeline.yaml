@@ -8,10 +8,13 @@ pipeline:
     ci:
       codebase:
         connectorRef: Harness
-        build: <+input>
+        build:
+          type: branch
+          spec:
+            branch: <+input>
   stages:
     - stage:
-        name: build stage
+        name: Build Stage
         identifier: build_stage
         type: CI
         spec:
@@ -30,19 +33,9 @@ pipeline:
           execution:
             steps:
               - step:
-                  type: GitClone
-                  name: GitClone_1
-                  identifier: GitClone_1
-                  spec:
-                    connectorRef: Harness
-                    build:
-                      type: branch
-                      spec:
-                        branch: My_testing_branch
-              - step:
                   type: Run
                   name: Maven Build
-                  identifier: Run_1
+                  identifier: Maven_Build
                   spec:
                     shell: Sh
                     command: mvn clean install
