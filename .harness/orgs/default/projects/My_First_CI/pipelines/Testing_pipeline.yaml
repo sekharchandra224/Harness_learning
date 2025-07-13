@@ -47,3 +47,4 @@ pipeline:
                   spec:
                     shell: Sh
                     command: mvn clean install
+                    workingDirectory: harness
