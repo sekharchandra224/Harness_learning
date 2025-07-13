@@ -1,6 +1,5 @@
 <build>
     <plugins>
-        <!-- Compiler plugin -->
         <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.8.0</version>
@@ -10,14 +9,13 @@
             </configuration>
         </plugin>
 
-        <!-- JAR plugin with Main-Class -->
         <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <version>3.2.0</version>
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>com.harness.Main</mainClass>
+                        <mainClass>com.harness.App</mainClass> <!-- change to your actual class with main() -->
                     </manifest>
                 </archive>
             </configuration>
