@@ -19,3 +19,4 @@ spec:
           image: chandradee/javaapp:1.0
           ports:
             - containerPort: 8080
+
