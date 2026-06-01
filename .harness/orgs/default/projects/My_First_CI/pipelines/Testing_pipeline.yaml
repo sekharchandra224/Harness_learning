@@ -1,0 +1,80 @@
+pipeline:
+  name: Testing_pipeline
+  identifier: Testing_pipeline
+  projectIdentifier: My_First_CI
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: Harness
+        build:
+          type: branch
+          spec:
+            branch: <+input>
+  stages:
+    - stage:
+        name: Build Stage
+        identifier: build_stage
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            override: true
+          buildIntelligence:
+            enabled: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Maven Build
+                  identifier: Maven_Build
+                  spec:
+                    shell: Sh
+                    command: mvn clean install
+    - stage:
+        name: Deploy to Minikube
+        identifier: Deploy_to_Minikube
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: javaappservice
+          environment:
+            environmentRef: devenvironment
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: minikubek8s
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 5m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
